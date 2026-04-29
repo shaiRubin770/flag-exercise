@@ -1,28 +1,17 @@
 namespace FlagExercise.Common.Models;
 
-/// <summary>
-/// Single configuration model used by both Tx and Rx services.
-/// Persisted to JSON in %ProgramData%\FlagExercise\{Tx|Rx}\config.json.
-/// </summary>
 public class AppConfig
 {
-    // Folders. On Windows the defaults point to C:\FlagExercise\... .
-    // On Linux/macOS (useful for development) we fall back to /tmp/flagexercise/... .
     public string SourceFolder { get; set; } =
         OperatingSystem.IsWindows() ? @"C:\FlagExercise\Source" : "/tmp/flagexercise/source";
     public string DestinationFolder { get; set; } =
         OperatingSystem.IsWindows() ? @"C:\FlagExercise\Destination" : "/tmp/flagexercise/destination";
 
-    // Polling timer (ms) — used in addition to FileSystemWatcher to "check the folder"
     public int PollIntervalMs { get; set; } = 2000;
 
-    // Tx-only: random flag-creation interval (seconds)
     public int FlagCreateMinSeconds { get; set; } = 5;
     public int FlagCreateMaxSeconds { get; set; } = 10;
 
-    // SMTP - all values are empty by default; the user fills them in from the UI.
-    // For Gmail: host = smtp.gmail.com, port = 587, SSL = true, and the password
-    // must be a 16-char App Password (Google Account -> Security -> App passwords).
     public bool SmtpEnabled { get; set; } = false;
     public string SmtpHost { get; set; } = "";
     public int SmtpPort { get; set; } = 587;
@@ -32,16 +21,13 @@ public class AppConfig
     public string SmtpFrom { get; set; } = "";
     public string SmtpTo { get; set; } = "";
 
-    // Syslog (RFC 3164, UDP)
     public bool SyslogEnabled { get; set; } = false;
     public string SyslogHost { get; set; } = "127.0.0.1";
     public int SyslogPort { get; set; } = 514;
 
-    // Misc
     public bool ServiceEnabled { get; set; } = true;
-    public string LogLevel { get; set; } = "Info"; // Debug|Info|Warn|Error
+    public string LogLevel { get; set; } = "Info";
 
-    /// <summary>Validate config and return human readable errors (empty list = OK).</summary>
     public List<string> Validate(bool isTx)
     {
         var errors = new List<string>();

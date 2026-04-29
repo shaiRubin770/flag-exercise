@@ -1,14 +1,9 @@
 namespace FlagExercise.Common.Services;
 
-/// <summary>
-/// Simple thread-safe logger.
-/// Writes every line to a flat file AND keeps the last N lines in memory
-/// so the UI can show a "live tail" without reading the file from disk.
-/// </summary>
 public class FileLogger
 {
     private const int MaxLinesInMemory = 500;
-    private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB then roll
+    private const long MaxFileSizeBytes = 5 * 1024 * 1024;
 
     private readonly string _path;
     private readonly object _lock = new();
@@ -26,7 +21,6 @@ public class FileLogger
     public void Debug(string message) => Write("DEBUG", message, null);
     public void Error(string message, Exception? ex = null) => Write("ERROR", message, ex);
 
-    /// <summary>Returns the last N log lines (oldest first).</summary>
     public List<string> Tail(int n)
     {
         lock (_lock)
@@ -44,7 +38,6 @@ public class FileLogger
 
         lock (_lock)
         {
-            // 1. Write to the flat file.
             try
             {
                 RollIfTooBig();
@@ -52,10 +45,9 @@ public class FileLogger
             }
             catch
             {
-                // Never throw from the logger - it would just crash the service.
+                // never throw from the logger
             }
 
-            // 2. Keep an in-memory copy for the UI tail.
             _recent.Add(line);
             if (_recent.Count > MaxLinesInMemory)
                 _recent.RemoveAt(0);

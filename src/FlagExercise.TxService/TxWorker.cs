@@ -3,17 +3,8 @@ using FlagExercise.Common.Services;
 
 namespace FlagExercise.TxService;
 
-/// <summary>
-/// What T(x) does:
-///   1. Every 5-10 seconds (random, configurable) it CREATES a "flag" file
-///      inside the Source folder.
-///   2. It WATCHES the Source folder. Whenever any file appears there, it
-///      MOVES that file into the Destination folder.
-///   3. It writes everything it does (and any errors) to the log file.
-/// </summary>
 public class TxWorker : BackgroundService
 {
-    // Retry tuning for file operations and worker recovery.
     private const int RetryAttempts = 10;
     private const int RetryDelayMs = 100;
     private const int RecoveryDelayMs = 2000;
@@ -38,11 +29,9 @@ public class TxWorker : BackgroundService
         _log = log;
         _notifier = notifier;
 
-        // If the user changes the Source folder from the UI, rebuild the watcher.
         _config.Changed += _ => RebuildWatcher();
     }
 
-    /// <summary>Snapshot used by the UI status panel.</summary>
     public TxStatusDto Status()
     {
         lock (_counterLock)
@@ -58,7 +47,6 @@ public class TxWorker : BackgroundService
         }
     }
 
-    /// <summary>Called from the UI: start / stop / restart the worker loop.</summary>
     public void Control(string action)
     {
         switch (action.ToLowerInvariant())
@@ -82,8 +70,6 @@ public class TxWorker : BackgroundService
         }
     }
 
-    // -------- Main loop --------
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _log.Info("Tx worker is starting.");
@@ -101,16 +87,13 @@ public class TxWorker : BackgroundService
                 {
                     EnsureFolders(cfg);
 
-                    // 1. Time to create a new flag?
                     if (DateTime.UtcNow >= _nextFlagTimeUtc)
                     {
                         CreateFlagFile(cfg);
                         ScheduleNextFlag(cfg);
                     }
 
-                    // 2. Belt-and-suspenders: also check the folder on a timer.
-                    //    The watcher catches new files instantly; this catches anything
-                    //    the watcher might miss (e.g. when the service was restarting).
+                    // safety net in case the watcher missed an event (e.g. during restart)
                     foreach (var file in Directory.EnumerateFiles(cfg.SourceFolder))
                         MoveFileToDestination(file, cfg);
                 }
@@ -132,8 +115,6 @@ public class TxWorker : BackgroundService
 
         _log.Info("Tx worker is stopping.");
     }
-
-    // -------- Helpers --------
 
     private static void EnsureFolders(AppConfig cfg)
     {
@@ -202,12 +183,11 @@ public class TxWorker : BackgroundService
     {
         try
         {
-            if (!File.Exists(sourcePath)) return; // already moved by another event
+            if (!File.Exists(sourcePath)) return;
 
             var fileName = Path.GetFileName(sourcePath);
             var destPath = Path.Combine(cfg.DestinationFolder, fileName);
 
-            // Don't overwrite an existing file in the destination - add a timestamp.
             if (File.Exists(destPath))
             {
                 var name = Path.GetFileNameWithoutExtension(fileName);
@@ -215,7 +195,7 @@ public class TxWorker : BackgroundService
                 destPath = Path.Combine(cfg.DestinationFolder, $"{name}_{DateTime.Now:HHmmssfff}{ext}");
             }
 
-            // Wait briefly until the file is no longer locked by the writer.
+            // wait until the writer releases the file
             for (int attempt = 0; attempt < RetryAttempts; attempt++)
             {
                 try
@@ -236,7 +216,6 @@ public class TxWorker : BackgroundService
         }
         catch (FileNotFoundException)
         {
-            // Another event already moved it - fine, ignore.
         }
         catch (Exception ex)
         {

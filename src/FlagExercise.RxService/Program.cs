@@ -35,16 +35,12 @@ try
     var app = builder.Build();
     var worker = app.Services.GetRequiredService<RxWorker>();
 
-    // ---------------------- HTTP API used by the React UI ----------------------
-
     app.MapGet("/", (HttpContext ctx) =>
     {
         ctx.Response.ContentType = "text/html; charset=utf-8";
         return ctx.Response.WriteAsync(EmbeddedIndex.Html(Role));
     });
 
-    // Silence the browser's automatic /favicon.ico request so it doesn't
-    // appear as a 404 in the developer console.
     app.MapGet("/favicon.ico", () => Results.StatusCode(204));
 
     app.MapGet("/api/config", () => Results.Json(configStore.Get()));

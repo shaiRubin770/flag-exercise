@@ -1,12 +1,7 @@
 namespace FlagExercise.Common.Web;
 
-/// <summary>
-/// Single-file React UI served directly by each service.
-/// No build step is needed: we use React from a CDN and the 'htm' template
-/// library (instead of JSX + Babel) so the browser runs pure JavaScript and
-/// does not print the "Babel in-browser" / "Tailwind CDN in production" warnings.
-/// All CSS is hand-rolled inline so there is no external stylesheet either.
-/// </summary>
+// Single-file React UI served by each service. React + htm are loaded from a CDN
+// so there is no build step.
 public static class EmbeddedIndex
 {
     public static string Html(string role)

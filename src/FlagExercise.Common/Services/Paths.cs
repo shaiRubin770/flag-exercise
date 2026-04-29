@@ -1,12 +1,10 @@
 namespace FlagExercise.Common.Services;
 
-/// <summary>Resolves on-disk locations for config and logs per role.</summary>
 public static class Paths
 {
     public static string RoleRoot(string role)
     {
-        // Allow override (useful for tests / non-default install). On Windows this defaults
-        // to %ProgramData%\FlagExercise\<role> which the LocalSystem service account can write.
+        // FLAGEX_DATA_ROOT lets tests / non-default installs override the base folder.
         var overrideRoot = Environment.GetEnvironmentVariable("FLAGEX_DATA_ROOT");
         var baseDir = !string.IsNullOrWhiteSpace(overrideRoot)
             ? overrideRoot!

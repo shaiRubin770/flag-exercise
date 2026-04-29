@@ -3,18 +3,12 @@ using FlagExercise.Common.Models;
 
 namespace FlagExercise.Common.Services;
 
-/// <summary>
-/// Reads and writes the service configuration as a JSON file on disk.
-/// Raises <see cref="Changed"/> when the configuration is saved so workers
-/// can react (e.g. rebuild their FileSystemWatcher on a new folder).
-/// </summary>
 public class ConfigStore
 {
     private readonly string _file;
     private readonly object _lock = new();
     private AppConfig _current = new();
 
-    /// <summary>Fired after a successful save.</summary>
     public event Action<AppConfig>? Changed;
 
     public ConfigStore(string role)
@@ -23,13 +17,11 @@ public class ConfigStore
         Load();
     }
 
-    /// <summary>Returns the current configuration.</summary>
     public AppConfig Get()
     {
         lock (_lock) return _current;
     }
 
-    /// <summary>Saves a new configuration to disk and notifies listeners.</summary>
     public void Save(AppConfig newConfig)
     {
         lock (_lock)
@@ -43,7 +35,6 @@ public class ConfigStore
 
     private void Load()
     {
-        // First run: create a default config file on disk.
         if (!File.Exists(_file))
         {
             Save(_current);
@@ -58,7 +49,7 @@ public class ConfigStore
         }
         catch
         {
-            // If the file is corrupt, fall back to defaults rather than crashing.
+            // corrupt file - fall back to defaults
             _current = new AppConfig();
         }
     }

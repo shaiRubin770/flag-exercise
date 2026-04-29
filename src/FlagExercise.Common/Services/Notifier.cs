@@ -4,13 +4,6 @@ using FlagExercise.Common.Models;
 
 namespace FlagExercise.Common.Services;
 
-/// <summary>
-/// Sends notifications. For each call:
-///   - If Syslog is enabled in the configuration, sends a UDP syslog message.
-///   - If SMTP   is enabled in the configuration, sends an email.
-/// Failures are logged but never thrown - a notification problem must not
-/// crash the main service.
-/// </summary>
 public class Notifier
 {
     private readonly string _appName;
