@@ -20,18 +20,17 @@ public class AppConfig
     public int FlagCreateMinSeconds { get; set; } = 5;
     public int FlagCreateMaxSeconds { get; set; } = 10;
 
-    // SMTP - defaults set up for sending from a Gmail account.
-    // To actually send email: create a Google App Password (Google Account -> Security ->
-    // 2-Step Verification -> App passwords) and put the 16-char password into SmtpPassword
-    // via the UI, then tick "SMTP enabled" and Save.
+    // SMTP - all values are empty by default; the user fills them in from the UI.
+    // For Gmail: host = smtp.gmail.com, port = 587, SSL = true, and the password
+    // must be a 16-char App Password (Google Account -> Security -> App passwords).
     public bool SmtpEnabled { get; set; } = false;
-    public string SmtpHost { get; set; } = "smtp.gmail.com";
+    public string SmtpHost { get; set; } = "";
     public int SmtpPort { get; set; } = 587;
     public bool SmtpUseSsl { get; set; } = true;
-    public string SmtpUser { get; set; } = "rubinshai@gmail.com";
+    public string SmtpUser { get; set; } = "";
     public string SmtpPassword { get; set; } = "";
-    public string SmtpFrom { get; set; } = "rubinshai@gmail.com";
-    public string SmtpTo { get; set; } = "rubinshai@gmail.com";
+    public string SmtpFrom { get; set; } = "";
+    public string SmtpTo { get; set; } = "";
 
     // Syslog (RFC 3164, UDP)
     public bool SyslogEnabled { get; set; } = false;

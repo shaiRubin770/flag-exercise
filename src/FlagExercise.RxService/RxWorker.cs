@@ -13,6 +13,11 @@ namespace FlagExercise.RxService;
 /// </summary>
 public class RxWorker : BackgroundService
 {
+    // Retry tuning for file operations and worker recovery.
+    private const int RetryAttempts = 10;
+    private const int RetryDelayMs = 100;
+    private const int RecoveryDelayMs = 2000;
+
     private readonly ConfigStore _config;
     private readonly FileLogger _log;
     private readonly Notifier _notifier;
@@ -32,18 +37,16 @@ public class RxWorker : BackgroundService
         _config.Changed += _ => RebuildWatcher();
     }
 
-    public object Status()
+    public RxStatusDto Status()
     {
         lock (_counterLock)
         {
-            return new
-            {
-                running = !_paused,
-                machine = Environment.MachineName,
-                filesDeleted = _filesDeleted,
-                errors = _errors,
-                config = _config.Get()
-            };
+            return new RxStatusDto(
+                Running: !_paused,
+                Machine: Environment.MachineName,
+                FilesDeleted: _filesDeleted,
+                Errors: _errors,
+                Config: _config.Get());
         }
     }
 
@@ -102,9 +105,9 @@ public class RxWorker : BackgroundService
             catch (Exception ex)
             {
                 IncrementErrors();
-                _log.Error("Rx loop crashed; will retry in 2 seconds.", ex);
+                _log.Error($"Rx loop crashed; will retry in {RecoveryDelayMs} ms.", ex);
                 _notifier.Notify(_config.Get(), "Rx service error", ex.Message);
-                try { await Task.Delay(2000, stoppingToken); } catch { }
+                try { await Task.Delay(RecoveryDelayMs, stoppingToken); } catch { }
             }
         }
 
@@ -151,7 +154,7 @@ public class RxWorker : BackgroundService
             if (!File.Exists(filePath)) return;
 
             // Wait briefly until the file is no longer locked.
-            for (int attempt = 0; attempt < 10; attempt++)
+            for (int attempt = 0; attempt < RetryAttempts; attempt++)
             {
                 try
                 {
@@ -160,7 +163,7 @@ public class RxWorker : BackgroundService
                 }
                 catch (IOException)
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(RetryDelayMs);
                 }
             }
 

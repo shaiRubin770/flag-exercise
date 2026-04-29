@@ -13,6 +13,11 @@ namespace FlagExercise.TxService;
 /// </summary>
 public class TxWorker : BackgroundService
 {
+    // Retry tuning for file operations and worker recovery.
+    private const int RetryAttempts = 10;
+    private const int RetryDelayMs = 100;
+    private const int RecoveryDelayMs = 2000;
+
     private readonly ConfigStore _config;
     private readonly FileLogger _log;
     private readonly Notifier _notifier;
@@ -38,20 +43,18 @@ public class TxWorker : BackgroundService
     }
 
     /// <summary>Snapshot used by the UI status panel.</summary>
-    public object Status()
+    public TxStatusDto Status()
     {
         lock (_counterLock)
         {
-            return new
-            {
-                running = !_paused,
-                machine = Environment.MachineName,
-                flagsCreated = _flagsCreated,
-                filesMoved = _filesMoved,
-                errors = _errors,
-                nextFlagAtUtc = _nextFlagTimeUtc.ToUniversalTime(),
-                config = _config.Get()
-            };
+            return new TxStatusDto(
+                Running: !_paused,
+                Machine: Environment.MachineName,
+                FlagsCreated: _flagsCreated,
+                FilesMoved: _filesMoved,
+                Errors: _errors,
+                NextFlagAtUtc: _nextFlagTimeUtc.ToUniversalTime(),
+                Config: _config.Get());
         }
     }
 
@@ -121,9 +124,9 @@ public class TxWorker : BackgroundService
             catch (Exception ex)
             {
                 IncrementErrors();
-                _log.Error("Tx loop crashed; will retry in 2 seconds.", ex);
+                _log.Error($"Tx loop crashed; will retry in {RecoveryDelayMs} ms.", ex);
                 _notifier.Notify(_config.Get(), "Tx service error", ex.Message);
-                try { await Task.Delay(2000, stoppingToken); } catch { }
+                try { await Task.Delay(RecoveryDelayMs, stoppingToken); } catch { }
             }
         }
 
@@ -213,7 +216,7 @@ public class TxWorker : BackgroundService
             }
 
             // Wait briefly until the file is no longer locked by the writer.
-            for (int attempt = 0; attempt < 10; attempt++)
+            for (int attempt = 0; attempt < RetryAttempts; attempt++)
             {
                 try
                 {
@@ -222,7 +225,7 @@ public class TxWorker : BackgroundService
                 }
                 catch (IOException)
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(RetryDelayMs);
                 }
             }
 
