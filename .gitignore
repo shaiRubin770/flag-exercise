@@ -1,0 +1,37 @@
+# ---------- .NET build output ----------
+bin/
+obj/
+*.user
+*.suo
+*.pdb
+*.dll
+*.exe
+
+# ---------- IDE / editors ----------
+.vs/
+.vscode/
+.idea/
+*.swp
+*.DS_Store
+
+# ---------- Rider / ReSharper ----------
+_ReSharper*/
+*.ReSharper
+
+# ---------- JetBrains ----------
+.idea/
+
+# ---------- local runtime data ----------
+# Runtime config and logs that services write at runtime.
+# (In production these live in %ProgramData%\FlagExercise\, but dev runs
+# with FLAGEX_DATA_ROOT might drop them into the repo folder by accident.)
+FlagExercise/
+*.log
+logs/
+
+# ---------- nuget caches ----------
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
