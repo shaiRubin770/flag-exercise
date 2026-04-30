@@ -21,7 +21,7 @@ public class TxWorker : BackgroundService
     private int _flagsCreated;
     private int _filesMoved;
     private int _errors;
-    private bool _paused;
+    private volatile bool _paused;
 
     public TxWorker(ConfigStore config, FileLogger log, Notifier notifier)
     {
@@ -42,8 +42,7 @@ public class TxWorker : BackgroundService
                 FlagsCreated: _flagsCreated,
                 FilesMoved: _filesMoved,
                 Errors: _errors,
-                NextFlagAtUtc: _nextFlagTimeUtc.ToUniversalTime(),
-                Config: _config.Get());
+                NextFlagAtUtc: _nextFlagTimeUtc.ToUniversalTime());
         }
     }
 
@@ -93,7 +92,6 @@ public class TxWorker : BackgroundService
                         ScheduleNextFlag(cfg);
                     }
 
-                    // safety net in case the watcher missed an event (e.g. during restart)
                     foreach (var file in Directory.EnumerateFiles(cfg.SourceFolder))
                         MoveFileToDestination(file, cfg);
                 }
@@ -195,7 +193,6 @@ public class TxWorker : BackgroundService
                 destPath = Path.Combine(cfg.DestinationFolder, $"{name}_{DateTime.Now:HHmmssfff}{ext}");
             }
 
-            // wait until the writer releases the file
             for (int attempt = 0; attempt < RetryAttempts; attempt++)
             {
                 try

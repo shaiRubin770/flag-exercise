@@ -6,12 +6,10 @@ public record TxStatusDto(
     int FlagsCreated,
     int FilesMoved,
     int Errors,
-    DateTime NextFlagAtUtc,
-    AppConfig Config);
+    DateTime NextFlagAtUtc);
 
 public record RxStatusDto(
     bool Running,
     string Machine,
     int FilesDeleted,
-    int Errors,
-    AppConfig Config);
+    int Errors);

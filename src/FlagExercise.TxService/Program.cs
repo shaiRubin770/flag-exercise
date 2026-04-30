@@ -21,6 +21,8 @@ try
 {
     var configStore = new ConfigStore(Role);
     var notifier    = new Notifier($"FlagExercise-{Role}", log);
+    log.MinLevel = configStore.Get().LogLevel;
+    configStore.Changed += cfg => log.MinLevel = cfg.LogLevel;
 
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseWindowsService(options => options.ServiceName = "FlagExercise.Tx");

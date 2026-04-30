@@ -3,7 +3,6 @@ using System.Text;
 
 namespace FlagExercise.Common.Services;
 
-// RFC 3164 syslog over UDP.
 public class SyslogClient
 {
     public enum Severity { Emergency=0, Alert=1, Critical=2, Error=3, Warning=4, Notice=5, Info=6, Debug=7 }

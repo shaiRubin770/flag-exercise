@@ -7,7 +7,9 @@ public class FileLogger
 
     private readonly string _path;
     private readonly object _lock = new();
-    private readonly List<string> _recent = new();
+    private readonly Queue<string> _recent = new();
+
+    public string MinLevel { get; set; } = "Info";
 
     public FileLogger(string role)
     {
@@ -24,14 +26,13 @@ public class FileLogger
     public List<string> Tail(int n)
     {
         lock (_lock)
-        {
-            if (n >= _recent.Count) return new List<string>(_recent);
-            return _recent.GetRange(_recent.Count - n, n);
-        }
+            return _recent.TakeLast(n).ToList();
     }
 
     private void Write(string level, string message, Exception? ex)
     {
+        if (LevelOrder(level) < LevelOrder(MinLevel)) return;
+
         var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{level,-5}] {message}";
         if (ex != null)
             line += $" :: {ex.GetType().Name}: {ex.Message}{Environment.NewLine}{ex.StackTrace}";
@@ -45,12 +46,12 @@ public class FileLogger
             }
             catch
             {
-                // never throw from the logger
+                
             }
 
-            _recent.Add(line);
+            _recent.Enqueue(line);
             if (_recent.Count > MaxLinesInMemory)
-                _recent.RemoveAt(0);
+                _recent.Dequeue();
         }
     }
 
@@ -62,4 +63,13 @@ public class FileLogger
         var rolled = _path + "." + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".bak";
         File.Move(_path, rolled, overwrite: true);
     }
+
+    private static int LevelOrder(string level) => level.ToUpperInvariant() switch
+    {
+        "DEBUG" => 0,
+        "INFO"  => 1,
+        "WARN"  => 2,
+        "ERROR" => 3,
+        _       => 1
+    };
 }

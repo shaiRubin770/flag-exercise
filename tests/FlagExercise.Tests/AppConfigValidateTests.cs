@@ -4,9 +4,7 @@ using Xunit;
 namespace FlagExercise.Tests;
 
 public class AppConfigValidateTests
-{
-    // ── helpers ──────────────────────────────────────────────────────────────
-
+{  
     private static AppConfig ValidTx() => new()
     {
         SourceFolder      = @"C:\FlagExercise\Source",
@@ -26,7 +24,6 @@ public class AppConfigValidateTests
         SyslogEnabled = false
     };
 
-    // ── folder rules ─────────────────────────────────────────────────────────
 
     [Fact]
     public void Validate_ReturnsError_WhenDestinationFolderIsMissing()
@@ -70,9 +67,7 @@ public class AppConfigValidateTests
         var errors = cfg.Validate(isTx: true);
 
         Assert.Contains(errors, e => e.Contains("differ", StringComparison.OrdinalIgnoreCase));
-    }
-
-    // ── poll interval ─────────────────────────────────────────────────────────
+    }   
 
     [Fact]
     public void Validate_ReturnsError_WhenPollIntervalTooLow()
@@ -108,9 +103,7 @@ public class AppConfigValidateTests
         var errors = cfg.Validate(isTx: true);
 
         Assert.DoesNotContain(errors, e => e.Contains("Poll interval", StringComparison.OrdinalIgnoreCase));
-    }
-
-    // ── flag timer (Tx only) ──────────────────────────────────────────────────
+    }  
 
     [Fact]
     public void Validate_ReturnsError_WhenFlagMinSecondsLessThanOne()
@@ -145,9 +138,7 @@ public class AppConfigValidateTests
         var errors = cfg.Validate(isTx: false);
 
         Assert.DoesNotContain(errors, e => e.Contains("seconds", StringComparison.OrdinalIgnoreCase));
-    }
-
-    // ── SMTP ──────────────────────────────────────────────────────────────────
+    } 
 
     [Fact]
     public void Validate_ReturnsError_WhenSmtpEnabledButHostMissing()
@@ -223,8 +214,6 @@ public class AppConfigValidateTests
         Assert.DoesNotContain(errors, e => e.Contains("SMTP", StringComparison.OrdinalIgnoreCase));
     }
 
-    // ── Syslog ────────────────────────────────────────────────────────────────
-
     [Fact]
     public void Validate_ReturnsError_WhenSyslogEnabledButHostMissing()
     {
@@ -251,8 +240,6 @@ public class AppConfigValidateTests
 
         Assert.Contains(errors, e => e.Contains("Syslog port", StringComparison.OrdinalIgnoreCase));
     }
-
-    // ── happy path ────────────────────────────────────────────────────────────
 
     [Fact]
     public void Validate_ReturnsNoErrors_WhenConfigIsValid()

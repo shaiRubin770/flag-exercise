@@ -4,7 +4,6 @@ public static class Paths
 {
     public static string RoleRoot(string role)
     {
-        // FLAGEX_DATA_ROOT lets tests / non-default installs override the base folder.
         var overrideRoot = Environment.GetEnvironmentVariable("FLAGEX_DATA_ROOT");
         var baseDir = !string.IsNullOrWhiteSpace(overrideRoot)
             ? overrideRoot!

@@ -17,7 +17,7 @@ public class RxWorker : BackgroundService
     private FileSystemWatcher? _watcher;
     private int _filesDeleted;
     private int _errors;
-    private bool _paused;
+    private volatile bool _paused;
 
     public RxWorker(ConfigStore config, FileLogger log, Notifier notifier)
     {
@@ -36,8 +36,7 @@ public class RxWorker : BackgroundService
                 Running: !_paused,
                 Machine: Environment.MachineName,
                 FilesDeleted: _filesDeleted,
-                Errors: _errors,
-                Config: _config.Get());
+                Errors: _errors);
         }
     }
 
@@ -80,7 +79,6 @@ public class RxWorker : BackgroundService
                 {
                     EnsureFolder(cfg);
 
-                    // safety net in case the watcher missed an event
                     foreach (var file in Directory.EnumerateFiles(cfg.DestinationFolder))
                         DeleteFile(file, cfg);
                 }
@@ -140,7 +138,6 @@ public class RxWorker : BackgroundService
         {
             if (!File.Exists(filePath)) return;
 
-            // wait until the writer releases the file
             for (int attempt = 0; attempt < RetryAttempts; attempt++)
             {
                 try

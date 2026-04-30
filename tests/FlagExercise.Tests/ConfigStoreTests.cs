@@ -5,13 +5,6 @@ using Xunit;
 
 namespace FlagExercise.Tests;
 
-/// <summary>
-/// Tests for ConfigStore: save/load round-trip, Changed event, corrupt file recovery,
-/// and default config file creation.
-///
-/// Each test gets its own temp directory via FLAGEX_DATA_ROOT so tests never
-/// touch %ProgramData% and do not interfere with each other.
-/// </summary>
 public sealed class ConfigStoreTests : IDisposable
 {
     private readonly string _tempRoot;
@@ -31,7 +24,7 @@ public sealed class ConfigStoreTests : IDisposable
         try { Directory.Delete(_tempRoot, recursive: true); } catch { }
     }
 
-    // ── round-trip ────────────────────────────────────────────────────────────
+    
 
     [Fact]
     public void SaveAndGet_RoundTrips_AllFields()
@@ -82,7 +75,7 @@ public sealed class ConfigStoreTests : IDisposable
         Assert.Equal(9999, store2.Get().PollIntervalMs);
     }
 
-    // ── Changed event ─────────────────────────────────────────────────────────
+    
 
     [Fact]
     public void Save_FiresChangedEvent_WithNewConfig()
@@ -107,7 +100,7 @@ public sealed class ConfigStoreTests : IDisposable
         Assert.Null(received);
     }
 
-    // ── corrupt / missing file ────────────────────────────────────────────────
+    
 
     [Fact]
     public void NewStore_WhenNoFileExists_CreatesConfigFileOnDisk()

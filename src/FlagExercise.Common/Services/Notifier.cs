@@ -18,8 +18,8 @@ public class Notifier
 
     public void Notify(AppConfig cfg, string subject, string body)
     {
-        if (cfg.SyslogEnabled) TrySendSyslog(cfg, subject, body);
-        if (cfg.SmtpEnabled)   TrySendEmail(cfg, subject, body);
+        if (cfg.SyslogEnabled) Task.Run(() => TrySendSyslog(cfg, subject, body));
+        if (cfg.SmtpEnabled)   Task.Run(() => TrySendEmail(cfg, subject, body));
     }
 
     private void TrySendSyslog(AppConfig cfg, string subject, string body)

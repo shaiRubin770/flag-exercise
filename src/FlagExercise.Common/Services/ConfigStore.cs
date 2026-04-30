@@ -49,7 +49,6 @@ public class ConfigStore
         }
         catch
         {
-            // corrupt file - fall back to defaults
             _current = new AppConfig();
         }
     }
