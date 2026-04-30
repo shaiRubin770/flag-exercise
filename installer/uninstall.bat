@@ -1,7 +1,7 @@
 @echo off
 REM ================================================================
-REM  FlagExercise Installer
-REM  Double-click this file to install the T(x) or R(x) service.
+REM  FlagExercise Uninstaller
+REM  Double-click this file to remove the T(x) or R(x) service.
 REM  Administrator rights are required - a UAC prompt will appear.
 REM ================================================================
 
@@ -14,11 +14,11 @@ if %errorLevel% neq 0 (
 )
 
 echo.
-echo  FlagExercise Installer
-echo  ----------------------
+echo  FlagExercise Uninstaller
+echo  ------------------------
 echo.
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Install.ps1" %*
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Uninstall.ps1" %*
 
 echo.
 pause

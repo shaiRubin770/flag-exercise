@@ -46,16 +46,18 @@ If anything you type is invalid (empty folder, bad email address, bad port numbe
 | **UI T(x)** / **UI R(x)** | A small web page hosted by each service | Lets you configure folders, SMTP, syslog, timers; shows live status and logs |
 | **Configuration file** | A JSON file under `C:\ProgramData\FlagExercise\<Role>\config.json` | Stores everything you set in the UI |
 | **Log file** | A text file under `C:\ProgramData\FlagExercise\<Role>\logs\` | Records every action and every error so an admin can audit what happened |
-| **Installer (Install.ps1)** | A PowerShell script | Asks "Tx or Rx?", builds and registers the chosen service with Windows |
-| **Uninstaller (Uninstall.ps1)** | A PowerShell script | Stops and removes the service and (optionally) the saved config + logs |
+| **Installer (`install.bat`)** | Double-click batch file (self-elevates via UAC) | Asks "Tx or Rx?", builds and registers the chosen service with Windows |
+| **Uninstaller (`uninstall.bat`)** | Double-click batch file (self-elevates via UAC) | Stops and removes the service and (optionally) the saved config + logs |
 
 ### How to use it (the short version)
 
-1. On the **Sender** machine, run the installer and choose **Tx**.
-2. On the **Receiver** machine, run the installer and choose **Rx**.
+1. On the **Sender** machine, **double-click `installer\install.bat`**, click *Yes* in the UAC prompt, and choose **Tx**.
+2. On the **Receiver** machine, **double-click `installer\install.bat`**, click *Yes* in the UAC prompt, and choose **Rx**.
 3. Open the browser on each machine (`localhost:5081` for Tx, `localhost:5082` for Rx) and fill in the folders and notification details.
 4. Click **Save**, then **Start** if it isn't already running.
 5. Watch the counters tick up. If you enabled email or syslog, you'll receive notifications every time the Receiver deletes a file.
+
+To uninstall, **double-click `installer\uninstall.bat`** and choose the role to remove.
 
 That's the whole exercise.
 
