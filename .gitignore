@@ -29,6 +29,10 @@ FlagExercise/
 *.log
 logs/
 
+# ---------- installer build artifacts ----------
+installer/publish/
+installer/dist/
+
 # ---------- nuget caches ----------
 *.nupkg
 packages/

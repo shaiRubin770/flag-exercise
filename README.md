@@ -46,18 +46,18 @@ If anything you type is invalid (empty folder, bad email address, bad port numbe
 | **UI T(x)** / **UI R(x)** | A small web page hosted by each service | Lets you configure folders, SMTP, syslog, timers; shows live status and logs |
 | **Configuration file** | A JSON file under `C:\ProgramData\FlagExercise\<Role>\config.json` | Stores everything you set in the UI |
 | **Log file** | A text file under `C:\ProgramData\FlagExercise\<Role>\logs\` | Records every action and every error so an admin can audit what happened |
-| **Installer (`install.bat`)** | Double-click batch file (self-elevates via UAC) | Asks "Tx or Rx?", builds and registers the chosen service with Windows |
-| **Uninstaller (`uninstall.bat`)** | Double-click batch file (self-elevates via UAC) | Stops and removes the service and (optionally) the saved config + logs |
+| **Installer (`FlagExercise-Setup.exe`)** | One-click Windows installer | Asks "Tx or Rx?", registers the chosen service with Windows, opens firewall port, starts the service |
+| **Uninstaller** | Windows "Apps & features" | Stops and removes the service and (optionally) the saved config + logs |
 
 ### How to use it (the short version)
 
-1. On the **Sender** machine, **double-click `installer\install.bat`**, click *Yes* in the UAC prompt, and choose **Tx**.
-2. On the **Receiver** machine, **double-click `installer\install.bat`**, click *Yes* in the UAC prompt, and choose **Rx**.
+1. On the **Sender** machine, **double-click `FlagExercise-Setup.exe`**, click *Yes* in the UAC prompt, and choose **Tx**.
+2. On the **Receiver** machine, **double-click `FlagExercise-Setup.exe`**, click *Yes* in the UAC prompt, and choose **Rx**.
 3. Open the browser on each machine (`localhost:5081` for Tx, `localhost:5082` for Rx) and fill in the folders and notification details.
 4. Click **Save**, then **Start** if it isn't already running.
 5. Watch the counters tick up. If you enabled email or syslog, you'll receive notifications every time the Receiver deletes a file.
 
-To uninstall, **double-click `installer\uninstall.bat`** and choose the role to remove.
+To uninstall, go to **Settings → Apps → FlagExercise → Uninstall**.
 
 That's the whole exercise.
 
@@ -80,7 +80,7 @@ That's the whole exercise.
 - **UI:** React (loaded via CDN) served by each service's embedded Kestrel HTTP host - no build step required.
 - **Logging:** rolling flat file in `%ProgramData%\FlagExercise\<Role>\logs\` plus optional Syslog (RFC 3164, UDP) and SMTP notifications.
 - **Configuration:** JSON file in `%ProgramData%\FlagExercise\<Role>\config.json`, edited live from the UI with both client-side and server-side validation.
-- **Installer:** `installer\Install.ps1` - asks whether to install **Tx** or **Rx** on this machine. One role per machine.
+- **Installer:** `FlagExercise-Setup.exe` — asks whether to install **Tx** or **Rx** on this machine. One role per machine.
 
 ### Project layout
 
@@ -91,67 +91,28 @@ src/
                                 syslog client, SMTP/Syslog notifier, embedded React UI
   FlagExercise.TxService/       T(x) worker + flag generator + file mover + UI host
   FlagExercise.RxService/       R(x) worker + file deleter + notifier + UI host
-installer/
-  Install.ps1                   prompts Tx/Rx, publishes, registers the service,
-                                opens firewall, starts it
-  Uninstall.ps1                 stops & removes the service, optionally wipes data
-  install.bat                   convenience wrapper
 ```
 
 ### Prerequisites
 
 - Windows 10/11 or Windows Server 2019+.
-- **.NET 8 SDK** to build & publish (download from <https://dotnet.microsoft.com/>).
-- Administrator PowerShell to install the service.
 
-### Build (manual)
+### One-click installer (.exe)
 
-```powershell
-dotnet restore
-dotnet build  -c Release
-# Publish the role you want:
-dotnet publish src\FlagExercise.TxService\FlagExercise.TxService.csproj -c Release -r win-x64 --self-contained false
-dotnet publish src\FlagExercise.RxService\FlagExercise.RxService.csproj -c Release -r win-x64 --self-contained false
-```
+A pre-built Windows installer is available that bundles the .NET 8 runtime
+(self-contained), so the target machine does **not** need anything pre-installed.
 
-### Install as a Windows Service
-
-Open **PowerShell as Administrator** in the repo root, then:
-
-```powershell
-# Interactive: the script asks "Tx or Rx?"
-powershell -ExecutionPolicy Bypass -File .\installer\Install.ps1
-
-# Non-interactive
-powershell -ExecutionPolicy Bypass -File .\installer\Install.ps1 -Role Tx
-powershell -ExecutionPolicy Bypass -File .\installer\Install.ps1 -Role Rx
-```
-
-The installer:
-
-1. Verifies elevation and the .NET SDK.
-2. Publishes the chosen project into `%ProgramFiles%\FlagExercise\<Role>\`.
-3. Creates a Windows Service (`FlagExercise.Tx` **or** `FlagExercise.Rx`) with auto-start and recovery actions (3 restarts on failure).
-4. Opens the relevant inbound TCP port in Windows Firewall.
-5. Starts the service.
-
-The service hosts its UI on:
-
-- **Tx UI:** http://localhost:5081
-- **Rx UI:** http://localhost:5082
-
-(Override with environment variables `FLAGEX_TX_URL` / `FLAGEX_RX_URL`.)
+- **Get it:** Download `FlagExercise-Setup-1.0.0.exe` from the project's
+  [GitHub Releases](https://github.com/shaiRubin770/flag-exercise/releases).
+- **Run it:** Double-click the `.exe` -> accept the UAC prompt -> choose **Tx** or
+  **Rx** in the wizard -> click through. The installer copies the files,
+  registers the Windows Service (auto-start + failure recovery), opens the
+  firewall port and starts the service.
+- **Uninstall:** Settings -> Apps -> FlagExercise -> Uninstall.
 
 ### Uninstall
 
-```powershell
-# Interactive
-powershell -ExecutionPolicy Bypass -File .\installer\Uninstall.ps1
-
-# Non-interactive
-powershell -ExecutionPolicy Bypass -File .\installer\Uninstall.ps1 -Role Tx
-powershell -ExecutionPolicy Bypass -File .\installer\Uninstall.ps1 -Role Rx -KeepData   # keep config + logs
-```
+Go to **Settings → Apps → FlagExercise → Uninstall**.
 
 ### Run during development (without installing)
 
@@ -218,8 +179,8 @@ Get-Content "$Env:ProgramData\FlagExercise\Rx\logs\rx-service.log" -Tail 50 -Wai
 
 ### Testing the full flow on two machines
 
-1. On **Machine A** run `Install.ps1` and choose **Tx**.
-2. On **Machine B** run `Install.ps1` and choose **Rx**.
+1. On **Machine A** double-click `FlagExercise-Setup.exe`, accept the UAC prompt, and choose **Tx**.
+2. On **Machine B** double-click `FlagExercise-Setup.exe`, accept the UAC prompt, and choose **Rx**.
 3. Make sure both machines can see the same destination folder (e.g. a UNC path like `\\fileserver\drop`).
 4. Open <http://localhost:5081> on Machine A and set Source + Destination.
 5. Open <http://localhost:5082> on Machine B and set the same Destination. Enable SMTP and/or Syslog and fill in your server.
