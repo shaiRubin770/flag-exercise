@@ -49,7 +49,7 @@ If anything you type is invalid (empty folder, bad email address, bad port numbe
 | **Installer (`FlagExercise-Setup.exe`)** | One-click Windows installer | Asks "Tx or Rx?", registers the chosen service with Windows, opens firewall port, starts the service |
 | **Uninstaller** | Windows "Apps & features" | Stops and removes the service and (optionally) the saved config + logs |
 
-### How to use it (the short version)
+### How to use it
 
 1. On the **Sender** machine, **double-click `FlagExercise-Setup.exe`**, click *Yes* in the UAC prompt, and choose **Tx**.
 2. On the **Receiver** machine, **double-click `FlagExercise-Setup.exe`**, click *Yes* in the UAC prompt, and choose **Rx**.
@@ -58,8 +58,6 @@ If anything you type is invalid (empty folder, bad email address, bad port numbe
 5. Watch the counters tick up. If you enabled email or syslog, you'll receive notifications every time the Receiver deletes a file.
 
 To uninstall, go to **Settings → Apps → FlagExercise → Uninstall**.
-
-That's the whole exercise.
 
 ---
 
@@ -97,12 +95,9 @@ src/
 
 - Windows 10/11 or Windows Server 2019+.
 
-### One-click installer (.exe)
+### installer (.exe)
 
-A pre-built Windows installer is available that bundles the .NET 8 runtime
-(self-contained), so the target machine does **not** need anything pre-installed.
-
-- **Get it:** Download `FlagExercise-Setup-1.0.0.exe` from the project's
+- **Get it:** Download `FlagExercise-Setup-1.0.1.exe` from the project's
   [GitHub Releases](https://github.com/shaiRubin770/flag-exercise/releases).
 - **Run it:** Double-click the `.exe` -> accept the UAC prompt -> choose **Tx** or
   **Rx** in the wizard -> click through. The installer copies the files,
