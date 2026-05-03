@@ -181,6 +181,7 @@ public class TxWorker : BackgroundService
     {
         try
         {
+            if (_paused || !cfg.ServiceEnabled) return;
             if (!File.Exists(sourcePath)) return;
 
             var fileName = Path.GetFileName(sourcePath);

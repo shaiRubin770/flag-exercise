@@ -136,6 +136,7 @@ public class RxWorker : BackgroundService
     {
         try
         {
+            if (_paused || !cfg.ServiceEnabled) return;
             if (!File.Exists(filePath)) return;
 
             for (int attempt = 0; attempt < RetryAttempts; attempt++)
