@@ -17,7 +17,7 @@ There are **two roles** — one per computer:
 - **R(x) — the Receiver / Cleaner.** Lives on Computer B.
   It watches the destination folder. As soon as a file lands there, it deletes the file and sends a notification — by **email (SMTP)** and to a **Syslog server** (a central log collector commonly used by IT departments).
 
-You install **only one role per machine** — the installer asks which one.
+You install **only one role per machine** — the installer asks which one. The two services are completely independent: each one writes its own configuration file, runs its own Windows service, hosts its own dashboard, and works on its own even if the other side has not been installed yet.
 
 ### What you see when you use it
 
@@ -100,9 +100,15 @@ src/
 - **Get it:** Download `FlagExercise-Setup-1.0.0.exe` from the project's
   [GitHub Releases](https://github.com/shaiRubin770/flag-exercise/releases).
 - **Run it:** Double-click the `.exe` -> accept the UAC prompt -> choose **Tx** or
-  **Rx** in the wizard -> click through. The installer copies the files,
-  registers the Windows Service (auto-start + failure recovery), opens the
-  firewall port and starts the service.
+  **Rx** in the wizard -> click through. The installer:
+  - copies the files,
+  - registers the Windows Service (auto-start + failure recovery),
+  - opens the firewall port,
+  - starts the service,
+  - drops a **desktop shortcut** + Start Menu entries pointing at the dashboard URL,
+  - and offers a final "Open the dashboard now" checkbox so the browser opens automatically when setup finishes.
+
+  No manual post-install steps are required.
 - **Uninstall:** Settings -> Apps -> FlagExercise -> Uninstall.
 
 ### Uninstall

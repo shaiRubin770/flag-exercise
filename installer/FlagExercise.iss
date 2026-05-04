@@ -27,6 +27,17 @@ UninstallDisplayName={#MyAppName}
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
+[Tasks]
+Name: "desktopicon"; Description: "Create a &desktop shortcut to the FlagExercise dashboard"; GroupDescription: "Additional shortcuts:"
+
+[Icons]
+Name: "{autodesktop}\FlagExercise (Tx)"; Filename: "http://localhost:{#TxPort}"; IconFilename: "{app}\Tx\FlagExercise.TxService.exe"; Comment: "Open the FlagExercise T(x) dashboard"; Tasks: desktopicon; Check: IsTxRole
+Name: "{autodesktop}\FlagExercise (Rx)"; Filename: "http://localhost:{#RxPort}"; IconFilename: "{app}\Rx\FlagExercise.RxService.exe"; Comment: "Open the FlagExercise R(x) dashboard"; Tasks: desktopicon; Check: IsRxRole
+
+Name: "{autoprograms}\FlagExercise\FlagExercise (Tx) Dashboard"; Filename: "http://localhost:{#TxPort}"; IconFilename: "{app}\Tx\FlagExercise.TxService.exe"; Check: IsTxRole
+Name: "{autoprograms}\FlagExercise\FlagExercise (Rx) Dashboard"; Filename: "http://localhost:{#RxPort}"; IconFilename: "{app}\Rx\FlagExercise.RxService.exe"; Check: IsRxRole
+Name: "{autoprograms}\FlagExercise\Uninstall FlagExercise"; Filename: "{uninstallexe}"
+
 [Files]
 Source: "publish\Tx\*"; DestDir: "{app}\Tx"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsTxRole
 Source: "publish\Rx\*"; DestDir: "{app}\Rx"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRxRole
@@ -58,6 +69,10 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""F
 
 Filename: "{sys}\sc.exe"; Parameters: "start {#TxSvc}"; Flags: runhidden; Check: IsTxRole; StatusMsg: "Starting Tx service..."
 Filename: "{sys}\sc.exe"; Parameters: "start {#RxSvc}"; Flags: runhidden; Check: IsRxRole; StatusMsg: "Starting Rx service..."
+
+; Offer to open the dashboard in the default browser when setup finishes.
+Filename: "http://localhost:{#TxPort}"; Description: "Open the FlagExercise T(x) dashboard now"; Flags: postinstall nowait shellexec skipifsilent; Check: IsTxRole
+Filename: "http://localhost:{#RxPort}"; Description: "Open the FlagExercise R(x) dashboard now"; Flags: postinstall nowait shellexec skipifsilent; Check: IsRxRole
 
 [UninstallRun]
 Filename: "powershell.exe"; Parameters: "-NoProfile -NonInteractive -Command ""$s='{#TxSvc}'; if (Get-Service $s -EA SilentlyContinue) {{ sc.exe stop $s | Out-Null; Start-Sleep 2; sc.exe delete $s | Out-Null }}"""; Flags: runhidden
