@@ -14,6 +14,11 @@ obj/
 *.swp
 *.DS_Store
 
+# ---------- Visual Studio upgrade / backup artifacts ----------
+Backup/
+UpgradeLog*.htm
+**/Properties/launchSettings.json
+
 # ---------- Rider / ReSharper ----------
 _ReSharper*/
 *.ReSharper

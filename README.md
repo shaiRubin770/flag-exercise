@@ -97,7 +97,7 @@ src/
 
 ### installer (.exe)
 
-- **Get it:** Download `FlagExercise-Setup-1.0.1.exe` from the project's
+- **Get it:** Download `FlagExercise-Setup-1.0.0.exe` from the project's
   [GitHub Releases](https://github.com/shaiRubin770/flag-exercise/releases).
 - **Run it:** Double-click the `.exe` -> accept the UAC prompt -> choose **Tx** or
   **Rx** in the wizard -> click through. The installer copies the files,

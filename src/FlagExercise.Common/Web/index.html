@@ -250,7 +250,7 @@
         <header>
           <div>
             <h1>__TITLE__</h1>
-            <div class="sub">Role: <b>${ROLE}</b> &middot; Host: ${status.machine || "-"}</div>
+            <div class="sub">Role: <b>${ROLE}</b> · Host: ${status.machine || "-"}</div>
           </div>
           <div>
             <span class=${"pill " + (running ? "run" : "stop")}>${running ? "RUNNING" : "STOPPED"}</span>
@@ -262,7 +262,7 @@
 
         <div class="grid">
           <section class="card">
-            <h2>Folders &amp; Timers</h2>
+            <h2>Folders & Timers</h2>
             ${IS_TX ? html`
               <${Field} name="sourceFolder" label="Source folder" error=${errs.sourceFolder}>
                 <input type="text" value=${cfg.sourceFolder || ""}

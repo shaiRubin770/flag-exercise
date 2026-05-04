@@ -1,5 +1,5 @@
 #define MyAppName    "FlagExercise"
-#define MyAppVersion "1.0.1"
+#define MyAppVersion "1.0.0"
 #define TxPort       "5081"
 #define RxPort       "5082"
 #define TxSvc        "FlagExercise.Tx"
